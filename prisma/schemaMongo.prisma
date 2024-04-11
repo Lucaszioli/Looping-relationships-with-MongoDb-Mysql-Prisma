@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output = "./generated/client2"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGO_DATABASE_URL")
+}
+
+model Aula{
+  id String @id @default(uuid()) @map("_id") 
+  comentarios Comentario[]
+}
+
+model Comentario{
+  id String @id @default(uuid()) @map("_id")
+  texto String
+  aula Aula? @relation(fields: [aulaId], references: [id])
+  aulaId String?
+  parentComentario Comentario? @relation("ComentarioToComentario", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentId String? 
+  replies Comentario[] @relation("ComentarioToComentario")
+  usuario Usuario @relation(fields: [createdBy], references: [id])
+  createdBy String
+}
+
+
+model Usuario{
+  id String @id @map("_id") @default(uuid())
+  comentarios Comentario[]
+}
